@@ -1,0 +1,24 @@
+# Zależności i paczki
+/node_modules
+/bower_components
+npm-debug.log
+yarn-error.log
+
+# Pliki buildów i dystrybucji
+/dist
+/build
+*.zip
+*.crx
+*.xpi
+
+# Pliki konfiguracyjne środowiska
+.env
+.env.local
+.env.*.local
+
+# Pliki tymczasowe i logi
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
