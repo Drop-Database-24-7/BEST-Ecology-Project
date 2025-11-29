@@ -1,0 +1,11 @@
+USAGE: 
+curl -X POST http://localhost:3000/api/analyze \
+-H "Content-Type: application/json" \
+-d '{"imageUrl": "https://img.ltwebstatic.com/images3_pi/2021/09/27/1632711674be123456.webp"}'
+
+**Response:**
+```json
+{
+  "isShein": true,
+  "url": "https://pl.shein.com/..."
+}
