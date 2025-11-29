@@ -1,25 +1,78 @@
+/* --- Główny kontener znacznika --- */
 .vinted-res-marker {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 20px;
-  height: 20px;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  z-index: 9999;
-  border: 3px solid white;
-  /* Default, will be overridden */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  background-color: #fff;
-  /* Fallback */
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  z-index: 999; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+
+  /* Ustawienia dla ikon SVG w tle */
+  background-size: 60%; /* Lekko zmniejszona ikona dla lepszego wyglądu */
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.vinted-res-marker.high-res {
-  border-color: #2ecc71;
-  /* Green Border */
+.vinted-res-marker:hover {
+  transform: scale(1.1);
 }
 
-.vinted-res-marker.low-res {
-  border-color: #e74c3c;
-  /* Red Border */
+/* --- Styl dla znacznika "Znaleziono" (CZERWONY) --- */
+.vinted-res-marker.legit {
+  background-color: #e74c3c; /* Czerwony */
+  
+  /* --- NOWA IKONA: Przekreślony liść --- */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M12 2A9.9 9.9 0 0 0 4.5 5.5A10.3 10.3 0 0 0 3 13.5a10.3 10.3 0 0 0 8 8.5A10.3 10.3 0 0 0 20 15.5c0-4-3.5-7-7-7a5.4 5.4 0 0 1-1-.1z"/><line x1="4" y1="4" x2="20" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="4" x2="4" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>');
+}
+
+/* --- Styl dla znacznika "Nie znaleziono" (ZIELONY) --- */
+.vinted-res-marker.no-legit {
+  background-color: #2ecc71; /* Jaśniejszy zielony */
+  
+  /* --- NOWA IKONA: Liść --- */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M12 2A9.9 9.9 0 0 0 4.5 5.5A10.3 10.3 0 0 0 3 13.5a10.3 10.3 0 0 0 8 8.5A10.3 10.3 0 0 0 20 15.5c0-4-3.5-7-7-7a5.4 5.4 0 0 1-1-.1z"/></svg>');
+}
+
+
+/* --- Dymek (Tooltip) --- */
+.vinted-tooltip-bubble {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: calc(100% + 10px); 
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2c3e50;
+  color: #fff;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 10;
+  width: 200px;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  line-height: 1.4;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Strzałka dla dymka */
+.vinted-tooltip-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 100%; 
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #2c3e50 transparent; 
+}
+
+.vinted-res-marker:hover .vinted-tooltip-bubble {
+  visibility: visible;
+  opacity: 1;
 }
