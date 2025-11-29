@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinted Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic styling to mimic grid */
+        .feed-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .feed-grid__item { width: 300px; border: 1px solid #ccc; padding: 10px; position: relative; }
+        .new-item-box__image-container { position: relative; }
+        img { max-width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="feed-grid">
+    <!-- Item 1: High Res (Mocked) -->
+    <div data-testid="grid-item" class="feed-grid__item">
+        <div class="feed-grid__item-content">
+            <div class="new-item-box__container">
+                <div class="new-item-box__image-container">
+                    <div class="new-item-box__image">
+                        <div class="web_ui__Image__image">
+                            <!-- Using a placeholder image that is high res -->
+                            <img src="https://via.placeholder.com/800x800" class="web_ui__Image__content" alt="High Res Item">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item 2: Low Res (Mocked) -->
+    <div data-testid="grid-item" class="feed-grid__item">
+        <div class="feed-grid__item-content">
+            <div class="new-item-box__container">
+                <div class="new-item-box__image-container">
+                    <div class="new-item-box__image">
+                        <div class="web_ui__Image__image">
+                            <!-- Using a placeholder image that is low res -->
+                            <img src="https://via.placeholder.com/300x300" class="web_ui__Image__content" alt="Low Res Item">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="content.js"></script>
+</body>
+</html>

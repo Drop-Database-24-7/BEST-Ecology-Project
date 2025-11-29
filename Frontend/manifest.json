@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Vinted Resolution Checker",
+  "version": "1.0",
+  "description": "Checks image resolution on Vinted and marks items green (high res) or red (low res).",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.vinted.pl/*",
+        "*://*.vinted.com/*",
+        "*://*.vinted.fr/*",
+        "*://*.vinted.de/*",
+        "*://*.vinted.it/*",
+        "*://*.vinted.co.uk/*",
+        "*://*.vinted.es/*",
+        "*://*.vinted.nl/*",
+        "*://*.vinted.be/*",
+        "*://*.vinted.pt/*",
+        "*://*.vinted.at/*",
+        "*://*.vinted.cz/*",
+        "*://*.vinted.lt/*",
+        "*://*.vinted.sk/*",
+        "*://*.vinted.hu/*",
+        "*://*.vinted.se/*",
+        "*://*.vinted.fi/*",
+        "*://*.vinted.dk/*",
+        "*://*.vinted.ro/*",
+        "*://*.vinted.gr/*",
+        "*://*.vinted.hr/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "*://*.vinted.net/*",
+    "*://*.vinted.com/*"
+  ]
+}

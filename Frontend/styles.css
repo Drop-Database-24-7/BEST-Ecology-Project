@@ -1,0 +1,25 @@
+.vinted-res-marker {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  z-index: 9999;
+  border: 3px solid white;
+  /* Default, will be overridden */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background-color: #fff;
+  /* Fallback */
+  transition: background-color 0.3s ease;
+}
+
+.vinted-res-marker.high-res {
+  border-color: #2ecc71;
+  /* Green Border */
+}
+
+.vinted-res-marker.low-res {
+  border-color: #e74c3c;
+  /* Red Border */
+}
