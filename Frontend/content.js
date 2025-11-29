@@ -20,6 +20,8 @@ function checkImageResolution(imgElement) {
   return maxDim >= HIGH_RES_THRESHOLD;
 }
 
+
+
 function addMarker(itemContainer, isHighRes, imgSrc) {
   if (itemContainer.querySelector('.vinted-res-marker')) return;
 
@@ -27,6 +29,11 @@ function addMarker(itemContainer, isHighRes, imgSrc) {
   marker.classList.add('vinted-res-marker');
   marker.classList.add(isHighRes ? 'high-res' : 'low-res');
   marker.title = isHighRes ? 'High Resolution' : 'Low Resolution';
+
+  const tooltip = document.createElement('span');
+  tooltip.className = 'vinted-tooltip-bubble';
+  tooltip.textContent = isHighRes ? 'High Resolution' : 'Low Resolution';
+  marker.appendChild(tooltip);
 
   // Set dominant color
   if (imgSrc) {
