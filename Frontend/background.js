@@ -6,6 +6,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
         return true; // Keep the message channel open for async response
     }
+    else if (request.action === "ANALYZE_IMAGE") {
+        fetch('http://localhost:3000/api/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ imageUrl: request.url })
+        })
+            .then(response => response.json())
+            .then(data => {
+                sendResponse({ analysis: data });
+            })
+            .catch(error => {
+                console.error("Background: Błąd podczas analizy obrazka", error);
+                sendResponse({ analysis: null });
+            });
+
+        return true;
+    }
 });
 
 async function extractColor(imageUrl) {

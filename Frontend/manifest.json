@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Vinted Resolution Checker",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Checks image resolution on Vinted and marks items green (high res) or red (low res).",
   "content_scripts": [
     {
