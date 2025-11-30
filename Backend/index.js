@@ -125,7 +125,7 @@ app.post("/api/analyze", async (req, res) => {
 
   let itemMeta = {
     brand: brand,
-    name: name,
+    name: name.replace("/", " "),
     description: description,
     imageUrl: imageUrl,
     price: price
