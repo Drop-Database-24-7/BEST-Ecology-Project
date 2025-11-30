@@ -1,12 +1,5 @@
-// Listen for messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "EXTRACT_COLOR") {
-        extractColor(request.url).then(color => {
-            sendResponse({ color: color });
-        });
-        return true; // Keep the message channel open for async response
-    }
-    else if (request.action === "ANALYZE_IMAGE") {
+    if (request.action === "ANALYZE_IMAGE") {
         fetch('http://localhost:3000/api/analyze', {
             method: 'POST',
             headers: {
@@ -24,7 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
 
         return true;
-    }else if (request.action === "CHECK_BRAND_TRUST") {
+    } else if (request.action === "CHECK_BRAND_TRUST") {
         console.log(`Background: Sprawdzam markę "${request.brand}"...`);
 
         fetch('http://localhost:3000/api/istrusted', {
@@ -32,37 +25,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ brand: request.brand }) // Wysyłamy markę
+            body: JSON.stringify({ brand: request.brand })
         })
             .then(response => response.json())
             .then(data => {
-                // Odsyłamy wynik z powrotem do content.js
-                sendResponse(data); // Oczekiwany format: { isTrusted: true/false }
+                sendResponse(data);
             })
             .catch(error => {
                 console.error("Background: Błąd podczas sprawdzania marki", error);
-                // W razie błędu (np. gdy backend jest wyłączony), odsyłamy null
                 sendResponse(null);
             });
 
-        return true; // WAŻNE: Utrzymuje kanał otwarty na odpowiedź
+        return true;
     }
 });
 
-async function extractColor(imageUrl) {
-    try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const bitmap = await createImageBitmap(blob);
-
-        const canvas = new OffscreenCanvas(1, 1);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0, 1, 1);
-
-        const p = ctx.getImageData(0, 0, 1, 1).data;
-        return `rgb(${p[0]}, ${p[1]}, ${p[2]})`;
-    } catch (error) {
-        console.error("Background: Error extracting color", error);
-        return null;
-    }
-}

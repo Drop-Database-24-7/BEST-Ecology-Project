@@ -1,4 +1,3 @@
-/* --- Główny kontener znacznika --- */
 .vinted-res-marker {
   position: absolute;
   top: 8px;
@@ -11,9 +10,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s ease;
 
-  /* Ustawienia dla ikon SVG w tle */
   background-size: 60%;
-  /* Lekko zmniejszona ikona dla lepszego wyglądu */
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -22,56 +19,40 @@
   transform: scale(1.1);
 }
 
-/* --- Styl dla znacznika "Znaleziono" (CZERWONY) --- */
 .vinted-res-marker.legit {
   background-color: #e74c3c;
-  /* Czerwony */
-
-  /* --- IKONA: Liść PNG --- */
   background-image: url('leaf.png');
 }
 
-/* --- Styl dla znacznika "Nie znaleziono" (ZIELONY) --- */
 .vinted-res-marker.no-legit {
   background-color: #2ecc71;
-  /* Jaśniejszy zielony */
-
-  /* --- IKONA: Liść PNG --- */
   background-image: url('leaf.png');
 }
 
 
-/* --- Dymek (Tooltip) --- */
 .vinted-tooltip-bubble {
   visibility: hidden;
   opacity: 0;
   position: fixed;
   background-color: #ffffff;
-  /* Jasne tło */
   color: #333333;
-  /* Ciemny tekst */
   text-align: center;
   padding: 10px 14px;
   border-radius: 8px;
   z-index: 99999;
-  /* Domyślna szerokość, może być nadpisana przez klasy */
   width: 160px;
-  /* ZWIĘKSZONA CZCIONKA */
   font-size: 14px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.4;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  /* Delikatniejszy cień */
   border: 1px solid #e0e0e0;
   pointer-events: none;
 
-  /* Przygotowanie do animacji */
   transform-origin: top center;
   transform: translateX(-50%) scale(0.5) translateY(-10px);
   transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
-/* Klasy szerokości */
 .vinted-tooltip-bubble.wide {
   width: 300px;
 }
@@ -83,7 +64,6 @@
   white-space: nowrap;
 }
 
-/* Klasa dodawana przez JS przy wyświetlaniu, aby uruchomić animację */
 .vinted-tooltip-bubble.visible {
   visibility: visible;
   opacity: 1;
@@ -102,7 +82,6 @@
   }
 }
 
-/* Strzałka dla dymka */
 .vinted-tooltip-bubble::after {
   content: "";
   position: absolute;
@@ -112,7 +91,5 @@
   border-width: 6px;
   border-style: solid;
   border-color: transparent transparent #ffffff transparent;
-  /* Kolor strzałki dopasowany do tła */
   filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.05));
-  /* Cień dla strzałki */
 }
