@@ -51,7 +51,7 @@ async function isFromShein(imagePath) {
       return { isShein: false, url: null };
     }
     
-    const targetKeywords = ['shein','aliexpress','romwe', 'temu', 'wish', 'joom'];
+    const targetKeywords = ['shein','aliexpress','romwe', 'temu', 'joom'];
     
     const allItems = [
       ...(webDetection.pagesWithMatchingImages || []),
