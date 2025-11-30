@@ -97,6 +97,70 @@ function processItem(item) {
     if (item.dataset.analysisProcessed) return;
     item.dataset.analysisProcessed = 'true';
 
+    // Inicjalizacja obiektu do przechowywania wydobytych danych
+    const productData = {
+        imgUrl: null,
+        name: null,
+        description: null,
+        price: null,
+        // Dodany atrybut dla firmy
+        brand: null
+    };
+
+    // 1. Pobieranie URL obrazu (img url)
+    const imgElement = item.querySelector('.new-item-box__image img');
+    if (imgElement) {
+        productData.imgUrl = imgElement.getAttribute('src');
+    }
+
+    // 2. Pobieranie Nazwy (name)
+    // Pobieramy pełny tytuł z atrybutu 'title' linku-overlay, a następnie skracamy do samej nazwy produktu.
+    const overlayLink = item.querySelector('.new-item-box__overlay--clickable');
+    if (overlayLink) {
+        const fullTitle = overlayLink.getAttribute('title');
+        // Nazwa produktu to zazwyczaj część tytułu przed pierwszą przecinkiem z dodatkowymi szczegółami.
+        const nameMatch = fullTitle.match(/^([^,]+)/);
+        if (nameMatch) {
+             productData.name = nameMatch[1].trim(); // "Sukienka Minoti nowa rozmiar 152 wysyłka Paczkomat"
+        } else {
+             productData.name = fullTitle;
+        }
+    }
+
+    // 3. Pobieranie Firmy/Marki (brand)
+    // Marka jest w elemencie z data-testid kończącym się na --description-title
+    const brandElement = item.querySelector('[data-testid$="--description-title"]');
+    if (brandElement) {
+        productData.brand = brandElement.textContent.trim(); // "Minoti"
+    }
+
+    // 4. Pobieranie Opisu (description)
+    // Opis to Rozmiar i Stan - pobieramy go z --description-subtitle
+    const descriptionSubtitleElement = item.querySelector('[data-testid$="--description-subtitle"]');
+    if (descriptionSubtitleElement) {
+        // "152 cm / 12 lat · Nowy z metką" (Rozmiar i Stan)
+        productData.description = descriptionSubtitleElement.textContent.trim();
+    } else {
+        // Jeśli nie ma podtytułu, używamy samej marki jako opisu (co jest mniej dokładne)
+        productData.description = productData.brand;
+    }
+
+    // 5. Pobieranie Ceny (price)
+    // Cena jest w elemencie z data-testid="...--price-text"
+    const priceElement = item.querySelector('[data-testid$="--price-text"]');
+    if (priceElement) {
+        // Usuwamy &nbsp; i bierzemy tekst ceny bazowej, np. "35,00 zł"
+        productData.price = priceElement.textContent.trim().replace(/\s/g, ' ');
+    } else {
+        // Alternatywnie, cena z Ochroną Kupujących
+        const finalPriceElement = item.querySelector('.web_ui__Text__subtitle');
+        if (finalPriceElement) {
+            productData.price = finalPriceElement.textContent.trim().replace(/\s/g, ' ');
+        }
+    }
+
+    // --- TYMCZASOWA LOGIKA TESTOWA ---
+    const isEven = itemCounter % 2 === 0;
     const textSelector = 'p.web_ui__Text__text.web_ui__Text__caption.web_ui__Text__left.web_ui__Text__truncated';
 
     // 2. Znajdź ten element wewnątrz przetwarzanego ogłoszenia
@@ -170,8 +234,12 @@ function processItem(item) {
     //     addMarker(item, true, 'https://shein.com/test-link');
     // }
     // itemCounter++;
+    itemCounter++;
+    console.log("Przetworzone dane produktu (z marką):", productData);
     // --- KONIEC LOGIKI TESTOWEJ ---
 }
+
+
 
 function run() {
     console.log("Skanowanie...");
