@@ -2,9 +2,9 @@
 let itemCounter = 0; // Licznik do testowania
 
 // Funkcja do komunikacji z background.js - bez zmian
-function analyzeImage(imageUrl, callback) {
+function analyzeImage(brand, name, description, imageUrl, price, callback) {
     chrome.runtime.sendMessage(
-        { action: "ANALYZE_IMAGE", url: imageUrl },
+        { action: "ANALYZE_IMAGE", brand: brand, name: name, description: description, url: imageUrl, price: price, },
         (response) => {
             callback(response ? response.analysis : null);
         }
@@ -201,14 +201,21 @@ function processItem(item) {
                         const img = item.querySelector('img.web_ui__Image__content');
                         if (img) {
                             const analyzeAndMark = (imageUrl) => {
-                                analyzeImage(imageUrl, (analysisResult) => {
-                                    if (analysisResult) {
-                                        addMarker(item, analysisResult.isShein, analysisResult.url);
-                                    } else {
-                                        // Jeśli serwer nie odpowie, oznacz jako "nie znaleziono"
-                                        addMarker(item, false, null);
-                                    }
-                                });
+                                // TUTAJ NASTĘPUJE ZMIANA: PRZEKAZUJEMY WSZYSTKIE ZEBRANE DANE
+                                analyzeImage(
+                                    productData.brand,
+                                    productData.name,
+                                    productData.description,
+                                    imageUrl, // Używamy aktualnego URL obrazu
+                                    productData.price,
+                                    (analysisResult) => {
+                                        if (analysisResult) {
+                                            addMarker(item, analysisResult.isShein, analysisResult.url);
+                                        } else {
+                                            // Jeśli serwer nie odpowie, oznacz jako "nie znaleziono"
+                                            addMarker(item, false, null);
+                                        }
+                                    });
                             };
 
                             // Sprawdź, czy obrazek jest już załadowany
