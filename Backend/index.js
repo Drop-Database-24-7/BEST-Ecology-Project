@@ -3,6 +3,7 @@ const cors = require("cors");
 const express = require("express");
 const admin = require("firebase-admin");
 const { getFirestore } = require("firebase-admin/firestore");
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
@@ -27,6 +28,10 @@ const client = new vision.ImageAnnotatorClient({
   keyFilename: VISION_KEY_PATH,
 });
 
+function hashString(str){
+  return crypto.createHash('sha256').update(str).digest('hex'); 
+}
+
 async function isTrusted(marka) {
   if (!marka) return { isTrusted: false };
 
@@ -44,30 +49,34 @@ async function isTrusted(marka) {
 async function saveItem(itemMeta) {
   try {
     // Sprawdzenie, czy itemMeta.name istnieje, aby użyć go jako nazwy dokumentu
-    if (!itemMeta || !itemMeta.name) {
+    if (!itemMeta || !itemMeta.hash) {
       console.log(itemMeta)
-      console.error("Błąd: Obiekt itemMeta lub jego pole 'name' jest nieprawidłowe.");
+      console.error("Błąd: Obiekt itemMeta lub jego pole 'hash' jest nieprawidłowe.");
       return;
     }
 
     // Używamy db.collection("nazwa_kolekcji").doc("ID_dokumentu").set(dane)
     const result = await db.collection("verified_items")
       .doc(itemMeta.hash) // Ustawienie nazwy dokumentu na itemMeta.name
-      .set(itemMeta);     // Zapisanie całego obiektu itemMeta jako danych dokumentu
-
-    console.log(`Dokument zapisany pomyślnie! Nazwa: ${itemMeta.name}`);
     
+    const docSnap = await result.get();
+
+    if(docSnap.exists) {
+      return;
+    }
+
+    await result.set(itemMeta);
+   
     // Zwrócenie wyniku (opcjonalnie, w zależności od potrzeb)
     return result;
 
   } catch (error) {
-    console.error("Błąd podczas zapisywania dokumentu do Firestore:", error);
     // Możesz tutaj rzucić błąd, aby obsłużyć go wyżej
     // throw error; 
   }
 }
 async function isFromShein(imagePath) {
-  const imageHash = hashString(imageUrl);
+  const imageHash = hashString(imagePath);
   const cacheRef = db.collection('verified_items').doc(imageHash);
   
   try {
@@ -75,11 +84,16 @@ async function isFromShein(imagePath) {
 
     if(cacheDoc.exists) {
       const data = cacheDoc.data();
-      console.log("cache hit!!!");
-      return {
-        isShein: data.isShein,
-        url: data.url
-      };
+      if(data.isShein !== undefined){
+        console.log("pobrano z bazy")
+        
+        return {
+          isShein: data.isShein,
+          url: data.url
+        };
+      } else {
+        console.log("przeanalizowano")
+      }
     }
 
     const [result] = await client.webDetection(imagePath);
@@ -109,8 +123,9 @@ async function isFromShein(imagePath) {
       }
 
       await cacheRef.set({
-        ...finalResult
-      })
+        ...finalResult,
+        analyzedAt: new Date().toISOString()
+      }, { merge: true })
   }
 
   return finalResult;
@@ -142,10 +157,13 @@ app.post("/api/analyze", async (req, res) => {
     });
   }
 
+  const imageHash = hashString(imageUrl);
+
   let itemMeta = {
-    brand: brand,
-    name: name.replace("/", " "),
-    description: description,
+    hash: imageHash,
+    brand: brand || "Unknown",
+    name: name ? name.replace("/", " ") : "Unknown Item",
+    description: description || "",
     imageUrl: imageUrl,
     price: price
   }
@@ -153,6 +171,8 @@ app.post("/api/analyze", async (req, res) => {
   // Save Item Meta 
   try {
     await saveItem(itemMeta);
+    const result = await isFromShein(imageUrl);
+    res.json(result);
   } 
   catch (err) {
     res.status(500).json({
@@ -160,20 +180,6 @@ app.post("/api/analyze", async (req, res) => {
       details: err.message,
     });
   }
-
-  // Save brand 
-  try {
-    const result = await isFromShein(imageUrl);
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({
-      error: "Internal server error",
-      details: err.message,
-    });
-  }
-
-  
-
 
 });
 
@@ -197,8 +203,6 @@ app.post("/api/istrusted", async (req, res) => {
   }
 });
 
-
-
 app.post("/api/save_item", async (req, res) => {
     const { name, img, description } = req.body;
     
@@ -207,9 +211,6 @@ app.post("/api/save_item", async (req, res) => {
         error: "Miising field",
       });
     }
-    console.log(name)
-    console.log(img)
-    console.log(description)
 
     /*
     TODO
