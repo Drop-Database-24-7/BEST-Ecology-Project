@@ -138,7 +138,7 @@ app.post("/api/analyze", async (req, res) => {
   catch (err) {
     res.status(500).json({
       error: "Internal server error",
-      details: error.message,
+      details: err.message,
     });
   }
 
