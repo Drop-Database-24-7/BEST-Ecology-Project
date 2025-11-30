@@ -147,7 +147,13 @@ function addMarker(itemContainer, isFound, foundUrl) {
     if (itemContainer.querySelector('.vinted-res-marker')) return;
 
     const marker = document.createElement('div');
+    const image = document.createElement('img');
+    image.src = chrome.runtime.getURL("leaf.png");
+    image.style.width = '100%';
+    image.style.height = '100%';
     marker.classList.add('vinted-res-marker');
+    marker.appendChild(image);
+
 
     const tooltip = document.createElement('span');
     tooltip.className = 'vinted-tooltip-bubble';
@@ -156,8 +162,19 @@ function addMarker(itemContainer, isFound, foundUrl) {
         // --- Logika dla znacznika CZERWONEGO (ZNALEZIONO) ---
         marker.classList.add('legit');
         marker.style.backgroundColor = 'red';
-        marker.title = 'Test - Znaleziono';
         tooltip.textContent = `Testowy link: ${foundUrl}`;
+
+        // Dodaj przekreśloną kreskę
+        const crossLine = document.createElement('div');
+        crossLine.style.position = 'absolute';
+        crossLine.style.width = '100%';
+        crossLine.style.height = '4px';
+        crossLine.style.backgroundColor = 'red';
+        crossLine.style.top = '50%';
+        crossLine.style.left = '50%';
+        crossLine.style.transform = 'translate(-50%, -50%) rotate(45deg)';
+        crossLine.style.pointerEvents = 'none';
+        marker.appendChild(crossLine);
 
         marker.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -167,11 +184,27 @@ function addMarker(itemContainer, isFound, foundUrl) {
         // --- Logika dla znacznika ZIELONEGO (NIE ZNALEZIONO) ---
         marker.classList.add('no-legit');
         marker.style.backgroundColor = 'green';
-        marker.title = 'Test - Nie znaleziono';
         tooltip.textContent = 'Test - Produkt nie znaleziony.';
     }
 
-    marker.appendChild(tooltip);
+    // Dodaj tooltip do body zamiast do markera
+    document.body.appendChild(tooltip);
+
+    // Pozycjonowanie tooltipa dynamicznie
+    marker.addEventListener('mouseenter', () => {
+        const rect = marker.getBoundingClientRect();
+        tooltip.style.position = 'fixed';
+        tooltip.style.top = `${rect.bottom + 10}px`;
+        tooltip.style.left = `${rect.left + rect.width / 2}px`;
+        tooltip.style.transform = 'translateX(-50%)';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.opacity = '1';
+    });
+
+    marker.addEventListener('mouseleave', () => {
+        tooltip.style.visibility = 'hidden';
+        tooltip.style.opacity = '0';
+    });
 
     const relativeContainer = itemContainer.querySelector('.new-item-box__image-container') || itemContainer;
     relativeContainer.appendChild(marker);

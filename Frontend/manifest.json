@@ -42,5 +42,11 @@
   "host_permissions": [
     "*://*.vinted.net/*",
     "*://*.vinted.com/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["leaf.png"],
+      "matches": ["*://*/*"]
+    }
   ]
 }
