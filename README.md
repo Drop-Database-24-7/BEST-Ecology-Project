@@ -1,6 +1,6 @@
 # Leaf Guard - Detektor Fast Fashion na Vinted
 
-**Pierwsza wtyczka**, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.
+**Pierwsza wtyczka**, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress itp.) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.
 
 ## Spis treści
 
@@ -17,7 +17,7 @@
 
 ## Opis projektu
 
-WhoMadeThis? to rozszerzenie Chrome, które automatycznie skanuje produkty na Vinted i wykrywa, czy pochodzą z platform fast fashion (Shein, Temu, AliExpress). Projekt składa się z dwóch głównych komponentów:
+Leaf Guard to rozszerzenie Chrome, które automatycznie skanuje produkty na Vinted i wykrywa, czy pochodzą z platform fast fashion (Shein, Temu, AliExpress). Projekt składa się z dwóch głównych komponentów:
 
 1. **Frontend** - Rozszerzenie Chrome (Manifest V3)
 2. **Backend** - API Node.js/Express z integracją Google Cloud Vision AI
@@ -30,6 +30,7 @@ WhoMadeThis? to rozszerzenie Chrome, które automatycznie skanuje produkty na Vi
 - **Tooltips informacyjne** - Szczegóły o wykryciu przy najechaniu
 - **Multi-region** - Wspiera 20+ domen Vinted w Europie
 - **Baza zaufanych marek** - Firebase Firestore
+- **Optymalizacja API** - Sprawdzanie czy zdjęcie zostało już sprawdzone, by zmniejszyć obłożenie API
 
 ---
 
@@ -91,7 +92,6 @@ Frontend/
 **background.js:**
 - `ANALYZE_IMAGE` - Przekazuje obraz do backend API
 - `CHECK_BRAND_TRUST` - Sprawdza markę w Firestore
-- `EXTRACT_COLOR` - Ekstrakcja koloru (OffscreenCanvas)
 
 **styles.css:**
 - `.vinted-res-marker` - Okrągły marker (28px)
@@ -172,7 +172,7 @@ node index.js
 2. Włącz **Tryb programisty** (Developer mode)
 3. Kliknij **Załaduj rozpakowane** (Load unpacked)
 4. Wybierz folder `Frontend/`
-5. Extension "WhoMadeThis?" pojawi się z ikoną liścia
+5. Extension "Leaf Guard" pojawi się z ikoną liścia
 
 ---
 
@@ -305,13 +305,12 @@ BEST-Ecology-Project/
 
 ### Wykrywanie produktów - Selektory DOM
 
-**Aktualne (testy A/B od ~2:30):**
 ```javascript
-'.new-item-box__container'              // Główny kontener produktu
-'.new-item-box__image img'              // Obrazek produktu
-'[data-testid$="--description-title"]'  // Nazwa marki
-'[data-testid$="--description-subtitle"]' // Rozmiar i stan
-'[data-testid$="--price-text"]'         // Cena
+'.new-item-box__container'
+'.new-item-box__image img'
+'[data-testid$="--description-title"]'
+'[data-testid$="--description-subtitle"]'
+'[data-testid$="--price-text"]'
 ```
 
 **Stare (przed testami A/B):**
@@ -325,12 +324,13 @@ BEST-Ecology-Project/
 2. **Delayed Scan** - 1 sekunda po załadowaniu/zmianie strony
 3. **Deduplication** - `dataset.analysisProcessed = 'true'`
 4. **Dynamic Tooltips** - position: fixed + getBoundingClientRect()
+5. **API Cache** - Sprawdzanie czy zdjęcie było już analizowane przed wysłaniem zapytania
 
 ### Wykrywanie Fast Fashion - Kryteria
 
 **Marki w opisie:**
 ```javascript
-['shein', 'temu', 'aliexpres'] // case-insensitive
+['shein', 'temu', 'aliexpres']
 ```
 
 **Domeny dla Web Detection:**
