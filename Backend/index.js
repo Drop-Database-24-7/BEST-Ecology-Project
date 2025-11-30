@@ -41,7 +41,31 @@ async function isTrusted(marka) {
     return { isTrusted: false, error: error.message };
   }
 }
+async function saveItem(itemMeta) {
+  try {
+    // Sprawdzenie, czy itemMeta.name istnieje, aby użyć go jako nazwy dokumentu
+    if (!itemMeta || !itemMeta.name) {
+      console.log(itemMeta)
+      console.error("Błąd: Obiekt itemMeta lub jego pole 'name' jest nieprawidłowe.");
+      return;
+    }
 
+    // Używamy db.collection("nazwa_kolekcji").doc("ID_dokumentu").set(dane)
+    const result = await db.collection("verified_items")
+      .doc(itemMeta.name) // Ustawienie nazwy dokumentu na itemMeta.name
+      .set(itemMeta);     // Zapisanie całego obiektu itemMeta jako danych dokumentu
+
+    console.log(`Dokument zapisany pomyślnie! Nazwa: ${itemMeta.name}`);
+    
+    // Zwrócenie wyniku (opcjonalnie, w zależności od potrzeb)
+    return result;
+
+  } catch (error) {
+    console.error("Błąd podczas zapisywania dokumentu do Firestore:", error);
+    // Możesz tutaj rzucić błąd, aby obsłużyć go wyżej
+    // throw error; 
+  }
+}
 async function isFromShein(imagePath) {
   try {
     const [result] = await client.webDetection(imagePath);
@@ -78,8 +102,20 @@ async function isFromShein(imagePath) {
   }
 }
 
+// Piotrek: Zapis do bazy danych metadanych
+/* 
+{
+  brand: String,
+  name: String,
+  description: String,
+  imgUrl: String,
+  price: String
+}
+*/
 app.post("/api/analyze", async (req, res) => {
-  const { imageUrl } = req.body;
+  const { brand, name, description, imageUrl, price } = req.body;
+
+  
 
   if (!imageUrl) {
     return res.status(400).json({
@@ -87,6 +123,26 @@ app.post("/api/analyze", async (req, res) => {
     });
   }
 
+  let itemMeta = {
+    brand: brand,
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
+    price: price
+  }
+
+  // Save Item Meta 
+  try {
+    await saveItem(itemMeta);
+  } 
+  catch (err) {
+    res.status(500).json({
+      error: "Internal server error",
+      details: error.message,
+    });
+  }
+
+  // Save brand 
   try {
     const result = await isFromShein(imageUrl);
     res.json(result);
@@ -96,6 +152,10 @@ app.post("/api/analyze", async (req, res) => {
       details: err.message,
     });
   }
+
+  
+
+
 });
 
 app.post("/api/istrusted", async (req, res) => {
@@ -118,14 +178,7 @@ app.post("/api/istrusted", async (req, res) => {
   }
 });
 
-// Piotrek: Zapis do bazy danych metadanych
-/* 
-{
-  img: bytes[],
-  name: String,
-  description: String,
-}
-*/
+
 
 app.post("/api/save_item", async (req, res) => {
     const { name, img, description } = req.body;

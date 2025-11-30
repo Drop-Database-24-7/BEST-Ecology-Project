@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ imageUrl: request.url })
+            body: JSON.stringify({ brand: request.brand, name: request.name, description: request.name, imageUrl: request.url, price: request.price })
         })
             .then(response => response.json())
             .then(data => {
