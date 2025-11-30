@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "WhoMadeThis?",
+  "name": "Leaf Guard",
   "version": "1.0",
-  "description": "Pierwsza wtyczka, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.",
+  "description": "Pierwsza wtyczka, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress itd.) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.",
   "icons": {
-    "16": "leaf.png",
-    "32": "leaf.png",
-    "48": "leaf.png",
-    "128": "leaf.png"
+    "16": "leaf-green.png",
+    "32": "leaf-green.png",
+    "48": "leaf-green.png",
+    "128": "leaf-green.png"
   },
   "content_scripts": [
     {
