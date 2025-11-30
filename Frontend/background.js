@@ -24,6 +24,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
 
         return true;
+    }else if (request.action === "CHECK_BRAND_TRUST") {
+        console.log(`Background: Sprawdzam markę "${request.brand}"...`);
+
+        fetch('http://localhost:3000/api/istrusted', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ brand: request.brand }) // Wysyłamy markę
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Odsyłamy wynik z powrotem do content.js
+                sendResponse(data); // Oczekiwany format: { isTrusted: true/false }
+            })
+            .catch(error => {
+                console.error("Background: Błąd podczas sprawdzania marki", error);
+                // W razie błędu, odsyłamy domyślną, bezpieczną odpowiedź
+                sendResponse({ isTrusted: false });
+            });
+
+        return true; // WAŻNE: Utrzymuje kanał otwarty na odpowiedź
     }
 });
 

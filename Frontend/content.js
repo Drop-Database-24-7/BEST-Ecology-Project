@@ -1,134 +1,3 @@
-// const HIGH_RES_THRESHOLD = 600; // px
-// let itemCounter = 0;
-//
-// function analyzeImage(imageUrl, callback) {
-//     chrome.runtime.sendMessage(
-//         {action: "ANALYZE_IMAGE", url: imageUrl},
-//         (response) => {
-//             if (response && response.analysis) {
-//                 callback(response.analysis);
-//             } else {
-//                 callback(null);
-//             }
-//         }
-//     );
-// }
-//
-// function betterMarker(itemContainer, isShein, foundUrl) {
-//
-//     if (itemContainer.querySelector('.vinted-res-marker')) return;
-//
-//     const marker = document.createElement('div');
-//     marker.classList.add('vinted-res-marker');
-//     marker.classList.add(isShein ? 'legit' : 'no-legit'); // Użyto "no-legit" dla spójności z CSS
-//     marker.title = isShein ? 'legit' : 'no-legit';
-//
-//     const tooltip = document.createElement('span');
-//     tooltip.className = 'vinted-tooltip-bubble';
-//     if (isShein) {
-//         tooltip.textContent = `Znaleziono na Shein! Link: ${foundUrl}`;
-//     } else {
-//         tooltip.textContent = 'Produkt nie znaleziony na Shein.';
-//     }
-//
-//     marker.appendChild(tooltip);
-//
-//     const relativeContainer = itemContainer.querySelector('.new-item-box__image-container') || itemContainer;
-//     relativeContainer.appendChild(marker);
-// }
-//
-//
-// function processItem(item) {
-//     const img = item.querySelector('img.web_ui__Image__content');
-//
-//     if (img) {
-//         if (img.complete) {
-//             analyzeImage(img.src, (analysisResult) => { // <-- Poprawka 1: img.src
-//                 if (analysisResult) { // Sprawdzamy tylko, czy serwer w ogóle odpowiedział
-//                     const isShein = analysisResult.isShein; // Będzie true lub false
-//                     const foundUrl = analysisResult.url;
-//                     betterMarker(item, isShein, foundUrl);
-//                 } else {
-//                     // Opcjonalnie: jeśli serwer nie odpowie, też pokaż zielony znacznik
-//                     betterMarker(item, false, null);
-//                 }
-//
-//             });
-//
-//
-//         } else {
-//             img.onload = () => {
-//                 analyzeImage(img.src, (analysisResult) => { // <-- Poprawka 1: img.src
-//                     if (analysisResult) { // Sprawdzamy tylko, czy serwer w ogóle odpowiedział
-//                         const isShein = analysisResult.isShein; // Będzie true lub false
-//                         const foundUrl = analysisResult.url;
-//                         betterMarker(item, isShein, foundUrl);
-//                     } else {
-//                         // Opcjonalnie: jeśli serwer nie odpowie, też pokaż zielony znacznik
-//                         betterMarker(item, false, null);
-//                     }
-//                 });
-//             };
-//         }
-//     }
-// }
-//
-// function run() {
-//     const items = document.querySelectorAll('.feed-grid__item');
-//     console.log("start")
-//     items.forEach(processItem);
-//
-//     console.log("Koniec")
-// }
-//
-//
-// let scanTimer;
-// let previousUrl = '';
-//
-// // Ta funkcja planuje skanowanie strony. Anuluje poprzednie, jeśli
-// // użytkownik szybko zmienia strony, i wykonuje się tylko raz.
-// function scheduleScan() {
-//     // Anuluj poprzedni timer, aby uniknąć wielokrotnych uruchomień
-//     clearTimeout(scanTimer);
-//
-//     // Ustaw nowy timer na 3 sekundy
-//     scanTimer = setTimeout(() => {
-//         console.log("Minęły 1 sekundy. Uruchamiam skanowanie...");
-//         run();
-//     }, 1000); // Czekaj 3000ms = 3 sekundy
-// }
-//
-// // Obserwator, który reaguje tylko na zmiany w adresie URL.
-// // To jest główny mechanizm wykrywania zmiany strony.
-// const urlObserver = new MutationObserver(() => {
-//     if (window.location.href !== previousUrl) {
-//         console.log(`Wykryto zmianę URL: ${window.location.href}`);
-//         previousUrl = window.location.href;
-//
-//         // Zaplanuj skanowanie dla nowej strony
-//         scheduleScan();
-//     }
-// });
-//
-// // Uruchomienie po raz pierwszy
-// // Czekamy, aż cała strona się załaduje, a potem planujemy pierwsze skanowanie.
-// window.addEventListener('load', () => {
-//     previousUrl = window.location.href;
-//     console.log("Strona w pełni załadowana. Planuję pierwsze skanowanie.");
-//     scheduleScan();
-//
-//     // Uruchom obserwatora URL dopiero po załadowaniu strony
-//     urlObserver.observe(document.body, {
-//         childList: true,
-//         subtree: true
-//     });
-// });
-//
-// // Uruchom skanowanie przy pierwszym załadowaniu strony
-// // run();
-//
-// observer.observe(document.body, {childList: true, subtree: true});
-
 
 let itemCounter = 0; // Licznik do testowania
 
@@ -210,23 +79,97 @@ function addMarker(itemContainer, isFound, foundUrl) {
     relativeContainer.appendChild(marker);
 }
 
+function checkBrandTrust(brandName, callback) {
+    chrome.runtime.sendMessage(
+        { action: "CHECK_BRAND_TRUST", brand: brandName },
+        (response) => {
+            // Odbieramy odpowiedź (np. { isTrusted: true }) i przekazujemy dalej
+            callback(response);
+        }
+    );
+}
+
+
+
 // TYMCZASOWO ZMIENIONA FUNKCJA processItem
 function processItem(item) {
     // Zabezpieczenie przed ponownym przetwarzaniem
     if (item.dataset.analysisProcessed) return;
     item.dataset.analysisProcessed = 'true';
 
-    // --- TYMCZASOWA LOGIKA TESTOWA ---
-    const isEven = itemCounter % 2 === 0;
+    const textSelector = 'p.web_ui__Text__text.web_ui__Text__caption.web_ui__Text__left.web_ui__Text__truncated';
 
-    if (isEven) {
-        // Co drugie ogłoszenie (parzyste) -> ZIELONY
-        addMarker(item, false, null);
-    } else {
-        // Co drugie ogłoszenie (nieparzyste) -> CZERWONY
-        addMarker(item, true, 'https://shein.com/test-link');
+    // 2. Znajdź ten element wewnątrz przetwarzanego ogłoszenia
+    const textElement = item.querySelector(textSelector);
+
+    // 3. Sprawdź, czy element został znaleziony i wyciągnij z niego tekst
+    if (textElement) {
+        // Pobierz tekst i "oczyść" go, usuwając znaki, które mogą powodować błędy w Firebase.
+        // Zastępujemy wszystkie wystąpienia '/' pustym ciągiem.
+        // Można tu dodać więcej znaków do usunięcia w przyszłości, np. /[\\/\[\]*?]/g
+        const extractedText = textElement.textContent.trim().replace(/\//g, '');
+
+        if(extractedText.toLowerCase() === 'shein')
+        {
+            // Jeśli marka to "Shein", od razu oznacz jako znalezione
+            addMarker(item, true, 'https://shein.com/test-link');
+            return;
+        }
+        else
+        {
+            checkBrandTrust(extractedText, (response) => {
+                if (response) {
+                    const isTrusted = response.isTrusted;
+
+                    if(isTrusted)
+                    {
+                        // Marka jest zaufana, więc analizujemy obrazek
+                        const img = item.querySelector('img.web_ui__Image__content');
+                        if (img) {
+                            const analyzeAndMark = (imageUrl) => {
+                                analyzeImage(imageUrl, (analysisResult) => {
+                                    if (analysisResult) {
+                                        addMarker(item, analysisResult.isShein, analysisResult.url);
+                                    } else {
+                                        // Jeśli serwer nie odpowie, oznacz jako "nie znaleziono"
+                                        addMarker(item, false, null);
+                                    }
+                                });
+                            };
+
+                            // Sprawdź, czy obrazek jest już załadowany
+                            if (img.complete) {
+                                analyzeAndMark(img.src);
+                            } else {
+                                img.onload = () => analyzeAndMark(img.src);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Marka nie jest zaufana, więc oznaczamy jako "znalezione" (czerwony znacznik)
+                        addMarker(item, true, 'https://shein.com/test-link');
+                        return;
+                    }
+                }
+            });
+        }
     }
-    itemCounter++;
+
+
+
+
+    // --- TYMCZASOWA LOGIKA TESTOWA ---
+    // const isEven = itemCounter % 2 === 0;
+    //
+    // if (isEven) {
+    //     // Co drugie ogłoszenie (parzyste) -> ZIELONY
+    //     addMarker(item, false, null);
+    // } else {
+    //     // Co drugie ogłoszenie (nieparzyste) -> CZERWONY
+    //     addMarker(item, true, 'https://shein.com/test-link');
+    // }
+    // itemCounter++;
     // --- KONIEC LOGIKI TESTOWEJ ---
 }
 
@@ -234,7 +177,12 @@ function run() {
     console.log("Skanowanie...");
     // Resetuj licznik przy każdym nowym skanowaniu, aby wzór się powtarzał
     itemCounter = 0;
-    const items = document.querySelectorAll('.feed-grid__item');
+
+    //zmienił sie querry selecotr okokło 2:30 z '.feed-grid__item' na '.new-item-box__container'
+    //testy A/B prawdopodobnie
+    //stary link: https://www.vinted.pl/catalog?page=1&time=1764469466&search_text=sukienki&search_by_image_uuid=&catalog[]=1247
+    //Uwaga na to
+    const items = document.querySelectorAll('.new-item-box__container');
     items.forEach(processItem);
     console.log(`Przeskanowano ${items.length} elementów.`);
 }
