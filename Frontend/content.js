@@ -160,7 +160,8 @@ function processItem(item) {
     }
 
     // --- TYMCZASOWA LOGIKA TESTOWA ---
-    const isEven = itemCounter % 2 === 0;
+
+
     const textSelector = 'p.web_ui__Text__text.web_ui__Text__caption.web_ui__Text__left.web_ui__Text__truncated';
 
     // 2. Znajdź ten element wewnątrz przetwarzanego ogłoszenia
@@ -176,7 +177,7 @@ function processItem(item) {
         if(extractedText.toLowerCase() === 'shein')
         {
             // Jeśli marka to "Shein", od razu oznacz jako znalezione
-            addMarker(item, true, 'https://shein.com/test-link');
+            addMarker(item, true, 'https://shein.com/test-link/brand/zly');
             return;
         }
         else
@@ -186,6 +187,10 @@ function processItem(item) {
                     const isTrusted = response.isTrusted;
 
                     if(isTrusted)
+                    {
+                        addMarker(item, false, null)
+                    }
+                    else
                     {
                         // Marka jest zaufana, więc analizujemy obrazek
                         const img = item.querySelector('img.web_ui__Image__content');
@@ -209,34 +214,16 @@ function processItem(item) {
                             }
                         }
                     }
-                    else
-                    {
-                        // Marka nie jest zaufana, więc oznaczamy jako "znalezione" (czerwony znacznik)
-                        addMarker(item, true, 'https://shein.com/test-link');
-                        return;
-                    }
+                } else {
+                    // Jeśli wystąpił błąd (np. backend nie odpowiedział), oznacz jako "nie znaleziono"
+                    // To zapobiega wyświetlaniu "no trust", gdy serwer jest po prostu wyłączony.
+                    addMarker(item, false, null);
                 }
             });
         }
     }
-
-
-
-
-    // --- TYMCZASOWA LOGIKA TESTOWA ---
-    // const isEven = itemCounter % 2 === 0;
-    //
-    // if (isEven) {
-    //     // Co drugie ogłoszenie (parzyste) -> ZIELONY
-    //     addMarker(item, false, null);
-    // } else {
-    //     // Co drugie ogłoszenie (nieparzyste) -> CZERWONY
-    //     addMarker(item, true, 'https://shein.com/test-link');
-    // }
-    // itemCounter++;
     itemCounter++;
     console.log("Przetworzone dane produktu (z marką):", productData);
-    // --- KONIEC LOGIKI TESTOWEJ ---
 }
 
 
