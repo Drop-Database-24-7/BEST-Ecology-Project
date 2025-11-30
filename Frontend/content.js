@@ -31,7 +31,13 @@ function addMarker(itemContainer, isFound, foundUrl) {
         // --- Logika dla znacznika CZERWONEGO (ZNALEZIONO) ---
         marker.classList.add('legit');
         marker.style.backgroundColor = 'red';
-        tooltip.textContent = `Testowy link: ${foundUrl}`;
+
+        // Rozróżnienie między wykryciem marki w opisie a znalezionym linkiem
+        if (foundUrl === 'brand_detected') {
+            tooltip.textContent = 'Opis zawiera frazę';
+        } else {
+            tooltip.textContent = `Znaleziony link: ${foundUrl}`;
+        }
 
         // Dodaj przekreśloną kreskę
         const crossLine = document.createElement('div');
@@ -45,15 +51,18 @@ function addMarker(itemContainer, isFound, foundUrl) {
         crossLine.style.pointerEvents = 'none';
         marker.appendChild(crossLine);
 
-        marker.addEventListener('click', (e) => {
-            e.stopPropagation();
-            window.open(foundUrl, '_blank');
-        });
+        // Dodaj kliknięcie tylko jeśli to link, nie dla wykrycia marki
+        if (foundUrl !== 'brand_detected') {
+            marker.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open(foundUrl, '_blank');
+            });
+        }
     } else {
         // --- Logika dla znacznika ZIELONEGO (NIE ZNALEZIONO) ---
         marker.classList.add('no-legit');
         marker.style.backgroundColor = 'green';
-        tooltip.textContent = 'Test - Produkt nie znaleziony.';
+        tooltip.textContent = 'Produkt nie znaleziony';
     }
 
     // Dodaj tooltip do body zamiast do markera
@@ -174,10 +183,10 @@ function processItem(item) {
         // Można tu dodać więcej znaków do usunięcia w przyszłości, np. /[\\/\[\]*?]/g
         const extractedText = textElement.textContent.trim().replace(/\//g, '');
 
-        if(extractedText.toLowerCase() === 'shein')
+        if(extractedText.toLowerCase() === 'shein' || extractedText.toLowerCase() === 'temu' || extractedText.toLowerCase() === 'aliexpress')
         {
             // Jeśli marka to "Shein", od razu oznacz jako znalezione
-            addMarker(item, true, 'https://shein.com/test-link/brand/zly');
+            addMarker(item, true, 'brand_detected');
             return;
         }
         else
