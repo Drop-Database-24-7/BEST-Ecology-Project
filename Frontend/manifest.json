@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Vinted Resolution Checker",
-  "version": "2.0",
-  "description": "Checks image resolution on Vinted and marks items green (high res) or red (low res).",
+  "name": "WhoMadeThis?",
+  "version": "1.0",
+  "description": "Pierwsza wtyczka AI, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.",
+  "icons": {
+    "16": "leaf.png",
+    "32": "leaf.png",
+    "48": "leaf.png",
+    "128": "leaf.png"
+  },
   "content_scripts": [
     {
       "matches": [
