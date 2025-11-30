@@ -35,8 +35,18 @@ function addMarker(itemContainer, isFound, foundUrl) {
         // Rozróżnienie między wykryciem marki w opisie a znalezionym linkiem
         if (foundUrl === 'brand_detected') {
             tooltip.textContent = 'Opis zawiera frazę';
+            // Domyślna szerokość dla krótkiego tekstu
+            tooltip.classList.remove('wide');
         } else {
-            tooltip.textContent = `Znaleziony link: ${foundUrl}`;
+            // Skracanie linku
+            let displayUrl = foundUrl;
+            if (displayUrl.length > 30) {
+                displayUrl = displayUrl.substring(0, 27) + '...';
+            }
+            tooltip.textContent = `Znaleziony link: ${displayUrl}`;
+
+            // Szerszy dymek dla linków
+            tooltip.classList.add('wide');
         }
 
         // Dodaj przekreśloną kreskę
@@ -63,6 +73,8 @@ function addMarker(itemContainer, isFound, foundUrl) {
         marker.classList.add('no-legit');
         marker.style.backgroundColor = 'green';
         tooltip.textContent = 'Produkt nie znaleziony';
+        // Domyślna szerokość
+        tooltip.classList.remove('wide');
     }
 
     // Dodaj tooltip do body zamiast do markera
@@ -75,13 +87,14 @@ function addMarker(itemContainer, isFound, foundUrl) {
         tooltip.style.top = `${rect.bottom + 10}px`;
         tooltip.style.left = `${rect.left + rect.width / 2}px`;
         tooltip.style.transform = 'translateX(-50%)';
-        tooltip.style.visibility = 'visible';
-        tooltip.style.opacity = '1';
+
+        // Zamiast ustawiać style bezpośrednio, dodajemy klasę 'visible'
+        tooltip.classList.add('visible');
     });
 
     marker.addEventListener('mouseleave', () => {
-        tooltip.style.visibility = 'hidden';
-        tooltip.style.opacity = '0';
+        // Usuwamy klasę 'visible'
+        tooltip.classList.remove('visible');
     });
 
     const relativeContainer = itemContainer.querySelector('.new-item-box__image-container') || itemContainer;
@@ -261,9 +274,9 @@ let previousUrl = '';
 function scheduleScan() {
     clearTimeout(scanTimer);
     scanTimer = setTimeout(() => {
-        console.log("Minęły 1 sekundy. Uruchamiam skanowanie...");
+        console.log("Minęły 2 sekundy. Uruchamiam skanowanie...");
         run();
-    }, 1000);
+    }, 2000);
 }
 
 const urlObserver = new MutationObserver(() => {

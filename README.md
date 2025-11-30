@@ -353,17 +353,6 @@ BEST-Ecology-Project/
 
 ---
 
-## TODO / Roadmap
-
-- [ ] Dodać więcej platform fast fashion (Wish, DHgate)
-- [ ] Cache wyników analizy obrazów
-- [ ] Ulepszenie UI (animacje, lepsze ikony)
-- [ ] Statystyki dla użytkownika
-- [ ] Publikacja w Chrome Web Store
-- [ ] Wsparcie dla Firefox
-
----
-
 ## Autorzy
 
 **U mnie (nie)działa**
