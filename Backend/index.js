@@ -52,7 +52,7 @@ async function saveItem(itemMeta) {
 
     // Używamy db.collection("nazwa_kolekcji").doc("ID_dokumentu").set(dane)
     const result = await db.collection("verified_items")
-      .doc(itemMeta.name) // Ustawienie nazwy dokumentu na itemMeta.name
+      .doc(itemMeta.hash) // Ustawienie nazwy dokumentu na itemMeta.name
       .set(itemMeta);     // Zapisanie całego obiektu itemMeta jako danych dokumentu
 
     console.log(`Dokument zapisany pomyślnie! Nazwa: ${itemMeta.name}`);
@@ -67,35 +67,54 @@ async function saveItem(itemMeta) {
   }
 }
 async function isFromShein(imagePath) {
+  const imageHash = hashString(imageUrl);
+  const cacheRef = db.collection('verified_items').doc(imageHash);
+  
   try {
-    const [result] = await client.webDetection(imagePath);
-    const webDetection = result.webDetection;
+    const cacheDoc = await cacheRef.get();
 
-    if (!webDetection) {
-      return { isShein: false, url: null };
-    }
-    
-    const targetKeywords = ['shein','aliexpress','romwe', 'temu', 'joom'];
-    
-    const allItems = [
-      ...(webDetection.pagesWithMatchingImages || []),
-      ...(webDetection.partialMatchingImages || []),
-      ...(webDetection.visuallySimilarImages || []),
-    ];
-
-    const foundItem = allItems.find((item) => {
-      const url = item.url ? item.url.toLowerCase() : "";
-      return targetKeywords.some((keyword) => url.includes(keyword));
-    });
-
-    if (foundItem) {
+    if(cacheDoc.exists) {
+      const data = cacheDoc.data();
+      console.log("cache hit!!!");
       return {
-        isShein: true,
-        url: foundItem.url,
+        isShein: data.isShein,
+        url: data.url
       };
     }
 
-    return { isShein: false, url: null };
+    const [result] = await client.webDetection(imagePath);
+    const webDetection = result.webDetection;
+    
+    let finalResult = { isShein: false, url: null };
+    if (webDetection) {
+    
+      const targetKeywords = ['shein','aliexpress','romwe', 'temu', 'joom'];
+    
+      const allItems = [
+        ...(webDetection.pagesWithMatchingImages || []),
+        ...(webDetection.partialMatchingImages || []),
+        ...(webDetection.visuallySimilarImages || []),
+      ];
+
+      const foundItem = allItems.find((item) => {
+        const url = item.url ? item.url.toLowerCase() : "";
+        return targetKeywords.some((keyword) => url.includes(keyword));
+      });
+
+      if (foundItem) {
+        finalResult = {
+          isShein: true,
+          url: foundItem.url,
+        };
+      }
+
+      await cacheRef.set({
+        ...finalResult
+      })
+  }
+
+  return finalResult;
+  
   } catch (error) {
     console.error("Błąd:", error);
     return { isShein: false, url: null, error: error.message };
