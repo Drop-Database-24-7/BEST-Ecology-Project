@@ -1,4 +1,4 @@
-# WhoMadeThis? - Detektor Fast Fashion na Vinted
+# Leaf Guard - Detektor Fast Fashion na Vinted
 
 **Pierwsza wtyczka**, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.
 
