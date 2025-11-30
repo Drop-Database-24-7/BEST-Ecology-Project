@@ -74,9 +74,9 @@ async function isFromShein(imagePath) {
     if (!webDetection) {
       return { isShein: false, url: null };
     }
-
-    const targetKeywords = ["shein", "aliexpress", "romwe"];
-
+    
+    const targetKeywords = ['shein','aliexpress','romwe', 'temu', 'wish', 'joom'];
+    
     const allItems = [
       ...(webDetection.pagesWithMatchingImages || []),
       ...(webDetection.partialMatchingImages || []),
@@ -149,7 +149,7 @@ app.post("/api/analyze", async (req, res) => {
   } catch (err) {
     res.status(500).json({
       error: "Internal server error",
-      details: error.message,
+      details: err.message,
     });
   }
 
@@ -173,7 +173,7 @@ app.post("/api/istrusted", async (req, res) => {
   } catch (err) {
     res.status(500).json({
       error: "Internal server error",
-      details: error.message,
+      details: err.message,
     });
   }
 });

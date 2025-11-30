@@ -41,8 +41,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             })
             .catch(error => {
                 console.error("Background: Błąd podczas sprawdzania marki", error);
-                // W razie błędu, odsyłamy domyślną, bezpieczną odpowiedź
-                sendResponse({ isTrusted: false });
+                // W razie błędu (np. gdy backend jest wyłączony), odsyłamy null
+                sendResponse(null);
             });
 
         return true; // WAŻNE: Utrzymuje kanał otwarty na odpowiedź
