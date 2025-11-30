@@ -13,6 +13,7 @@ function analyzeImage(brand, name, description, imageUrl, price, callback) {
 
 // ULEPSZONA FUNKCJA DO TWORZENIA ZNACZNIKÓW
 function addMarker(itemContainer, isFound, foundUrl) {
+    // Jeśli jest już inny znacznik, nie dodawaj nowego
     if (itemContainer.querySelector('.vinted-res-marker')) return;
 
     const marker = document.createElement('div');
@@ -246,12 +247,14 @@ function processItem(item) {
                 }
             });
         }
+    } else {
+        // Jeśli nie znaleziono tekstu marki, ale dodaliśmy loading marker, musimy go usunąć lub zmienić na "nie znaleziono"
+        // W tym przypadku, jeśli nie ma marki, nie możemy sprawdzić zaufania, więc zakładamy że nie znaleziono
+        addMarker(item, false, null);
     }
     itemCounter++;
     console.log("Przetworzone dane produktu (z marką):", productData);
 }
-
-
 
 function run() {
     console.log("Skanowanie...");
@@ -267,22 +270,54 @@ function run() {
     console.log(`Przeskanowano ${items.length} elementów.`);
 }
 
-// --- NIEZAWODNY MECHANIZM URUCHAMIANIA ---
-let scanTimer;
+// --- NIEZAWODNY MECHANIZM URUCHAMIANIA Z THROTTLINGIEM ---
+let isScanning = false;
+let scanPending = false;
 let previousUrl = '';
 
 function scheduleScan() {
-    clearTimeout(scanTimer);
-    scanTimer = setTimeout(() => {
-        console.log("Minęły 2 sekundy. Uruchamiam skanowanie...");
-        run();
-    }, 2000);
+    if (isScanning) {
+        console.log("Skanowanie w toku lub w okresie karencji. Oznaczono jako oczekujące.");
+        scanPending = true;
+        return;
+    }
+
+    isScanning = true;
+    run();
+
+    setTimeout(() => {
+        console.log("Koniec okresu karencji (3s).");
+        isScanning = false;
+        if (scanPending) {
+            scanPending = false;
+            console.log("Znaleziono oczekujące skanowanie. Uruchamiam ponownie.");
+            scheduleScan();
+        }
+    }, 3000);
 }
 
+const observer = new MutationObserver((mutations) => {
+    let shouldScan = false;
+    for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+            shouldScan = true;
+            break;
+        }
+    }
+
+    if (shouldScan) {
+        console.log("Wykryto nowe elementy w DOM.");
+        scheduleScan();
+    }
+});
+
+// Obserwator URL (dla SPA)
 const urlObserver = new MutationObserver(() => {
     if (window.location.href !== previousUrl) {
         console.log(`Wykryto zmianę URL.`);
         previousUrl = window.location.href;
+        // Przy zmianie URL chcemy skanować natychmiast (jeśli nie ma blokady), 
+        // ale logika scheduleScan obsłuży to poprawnie.
         scheduleScan();
     }
 });
@@ -292,6 +327,13 @@ window.addEventListener('load', () => {
     console.log("Strona załadowana. Planuję pierwsze skanowanie.");
     scheduleScan();
 
+    // Obserwuj całe body pod kątem zmian w drzewie DOM (nowe elementy)
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    // Obserwuj zmiany URL (opcjonalne, jeśli Vinted to SPA)
     urlObserver.observe(document.body, {
         childList: true,
         subtree: true

@@ -1,6 +1,6 @@
 # WhoMadeThis? - Detektor Fast Fashion na Vinted
 
-**Pierwsza wtyczka AI**, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.
+**Pierwsza wtyczka**, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.
 
 ## Spis treści
 
