@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "WhoMadeThis?",
   "version": "1.0",
-  "description": "Pierwsza wtyczka AI, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.",
+  "description": "Pierwsza wtyczka, która w czasie rzeczywistym wykrywa ukryte produkty Fast Fashion (Shein, Temu, AliExpress) na Vinted. Chronimy Cię przed greenwashingiem i przepłacaniem za plastik.",
   "icons": {
     "16": "leaf.png",
     "32": "leaf.png",
@@ -51,8 +51,12 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["leaf.png"],
-      "matches": ["*://*/*"]
+      "resources": [
+        "leaf.png"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
     }
   ]
 }
